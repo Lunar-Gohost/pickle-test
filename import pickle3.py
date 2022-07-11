@@ -1,10 +1,45 @@
 from ast import Global
 import pickle
 import os
-import re
 
-
-def voting ( number_of_task, token_wallet_voting):
+def Task_Status ():
+    # Values
+    # First Number - List Number
+    # Second Number - Value / Reward
+    # Status - 0 Open, 1 In Progress, 2 Closed
+    tasklist_filename = 'tasklist1.dat'
+    taskList = []
+    #pickle
+    pickle_out = open("taskList.pickle", "wb")
+    pickle.dump(taskList, pickle_out)
+    pickle_out.close()
+    print("Finished","\n")
+    #unpickle
+    pickle_in = open("taskList.pickle", "rb")
+    taskList = pickle.load(pickle_in)
+    print(taskList,"\n")
+    task = input("Please select a task ")
+    task = int(task)
+    print("Selected",taskList[task-1][0],"\n")
+    if taskList[task-1][2] == 0:
+        status = "Open"
+    elif taskList[task-1][2] == 1:
+        status = "In Progress"
+    elif taskList[task-1][2] == 2:
+        status = "Closed"
+    print("---------------------")
+    print(" Task selected:",taskList[task-1][0],"\n","Reward:",taskList[task-1][1],"\n","Status:",status)
+    print("---------------------","\n")
+    # taskValue = [0][1]
+    # print(taskValue)
+    # print("Selected", taskList[0][1])
+    # print("Task")
+    # -----------------
+    # Task:1
+    # Reward: 1ETH
+    # Status: Open
+    # -----------------
+def voting (number_of_task, token_wallet_voting):
     postive_vote=0
     negitve_vote=0
     vote_test1="fail"
@@ -31,18 +66,19 @@ def voting ( number_of_task, token_wallet_voting):
         return(Vote_statuse)
 
 
-def creat_preposal():
-    Preposals_filename = 'Preposals2.dat'
+def creat_preposal():#needs to fix pickleing 
+    global Perpsoal_creation
+    Perpsoal_creation = 'Preposals_creation.dat'
 
-    preposal_list = []
+    preposal_creation_list = []
 
     # first time you run this, "Preposals.dat" won't exist
     #   so we need to check for its existence before we load 
     #   our "database"
-    if os.path.exists(Preposals_filename):
+    if os.path.exists(Perpsoal_creation):
         # "with" statements are very handy for opening files. 
-        with open(Preposals_filename,'rb') as rfp: 
-            preposal_list = pickle.load(rfp)
+        with open(Perpsoal_creation,'rb') as rfp: 
+            preposal_creation_list = pickle.load(rfp)
         # Notice that there's no "rfp.close()"
         #   ... the "with" clause calls close() automatically! 
 
@@ -53,11 +89,11 @@ def creat_preposal():
     preposal_list.append(new_preposal)
 
     # Now we "sync" our database
-    with open(Preposals_filename,'wb') as wfp:
+    with open(Name_of_Aplacent_list,'wb') as wfp:
         pickle.dump(preposal_list, wfp)
 
     # Re-load our database
-    with open(Preposals_filename,'rb') as rfp:
+    with open(Name_of_Aplacent_list,'rb') as rfp:
         preposal_list = pickle.load(rfp)
 
     print(preposal_list)
@@ -98,35 +134,98 @@ def item_list_counter(list_ilc):
 #varbals
 token_wallet=1
 curent_status_main="available"    
-global preposal_list
+global Perpsoal_creation
 
 #Pickle setup(can't be a function)
-Preposals_filename = 'Preposals2.dat'
-preposal_list = "high_scores.dat"
+Name_of_Aplacent_list = 'Preposals12.dat'
+
+preposal_list = []
 
 # first time you run this, "Preposals.dat" won't exist
 #   so we need to check for its existence before we load 
 #   our "database"
-if os.path.exists(Preposals_filename):
+if os.path.exists(Name_of_Aplacent_list):
     # "with" statements are very handy for opening files. 
-    with open(Preposals_filename,'rb') as rfp: 
+    with open(Name_of_Aplacent_list,'rb') as rfp: 
         preposal_list = pickle.load(rfp)
-print (preposal_list)
+    # Notice that there's no "rfp.close()"
+    #   ... the "with" clause calls close() automatically! 
+
+# Now we "sync" our database
+with open(Name_of_Aplacent_list,'wb') as wfp:
+    pickle.dump(preposal_list, wfp)
+# Re-load our database
+with open(Name_of_Aplacent_list,'rb') as rfp:
+    preposal_list = pickle.load(rfp)
+
+print("test",preposal_list)
+
 
 #add more to the options later
 To_do=input("Do you wish to look at preposals, apply for tasks or vote on them? To vote on preposles select vote, to veiw preposlas select veiw, to apply for a preposal selct apply. ")#add ethan's part to the look at
+
+
 if To_do=="vote":
-    
-    print("Do you wish for, ", user_for_task, "to do task,", task_wish )
-    final_vote=voting ( task_wish, token_wallet)
-    if final_vote=="fail":
-        print("user ", user_for_task, "cant do task", task_wish)
-    else: 
-        print ("user ", user_for_task, "will do task", task_wish)   
+    vote_on=input("Do you want to vote on, wether a task is done, wether to aprove a aplaction task or somone to do a requested task ")
+    #can be used for all voteing 
+    if vote_on=="aprove":
+        task_perform_filename = 'task_perform.dat'
+
+        Task_perform = []
+        if os.path.exists(task_perform_filename):
+            with open(task_perform_filename,'rb') as rfp: 
+                Task_perform = pickle.load(rfp)
+        with open(task_perform_filename,'wb') as wfp:
+            pickle.dump(Task_perform, wfp)
+        with open(task_perform_filename,'rb') as rfp:
+            Task_perform = pickle.load(rfp) 
+            print(Task_perform)
+        range_needed=item_list_counter(Task_perform)
+        for i in range(0,range_needed):
+            print("Do you want", Task_perform[i][0], "to perform task", Task_perform[i][1])
+            vote_results=voting(range_needed, token_wallet)
+            if vote_results=="pass":
+                print("user ",Task_perform[i][0], "will do task", Task_perform[i][1])
+            if vote_results=="fail":
+                print("user ",Task_perform[i][0], "will do not task", Task_perform[i][1])
+    #print("Do you wish for, ", user_for_task, "to do task,", task_wish )
+    #final_vote=voting ( task_wish, token_wallet)
+    #if final_vote=="fail":
+    #    print("user ", user_for_task, "cant do task", task_wish)
+    #else: 
+    #    print ("user ", user_for_task, "will do task", task_wish)   
 if To_do=="apply":
-    list_length=item_list_counter(preposal_list)
+    list_length=item_list_counter(Name_of_Aplacent_list)
     aplaction=Task_Aplaction(token_wallet, list_length)  
     print("User", aplaction[0], "wants to perform", aplaction[1])
+    task_perform_filename = 'task_perform.dat'
+
+    Task_perform = []
+
+    # first time you run this, "high_task_perform.dat" won't exist
+    #   so we need to check for its existence before we load 
+    #   our "database"
+    if os.path.exists(task_perform_filename):
+        # "with" statements are very handy for opening files. 
+        with open(task_perform_filename,'rb') as rfp: 
+            Task_perform = pickle.load(rfp)
+        # Notice that there's no "rfp.close()"
+        #   ... the "with" clause calls close() automatically! 
+
+    high_Task_perform = aplaction
+    Task_perform.append(high_Task_perform)
+
+    # Now we "sync" our database
+    with open(task_perform_filename,'wb') as wfp:
+        pickle.dump(Task_perform, wfp)
+
+    # Re-load our database
+    with open(task_perform_filename,'rb') as rfp:
+        Task_perform = pickle.load(rfp) 
+        print(Task_perform)
+if To_do=="status":
+   statuse=Task_Status ()
+   print(statuse)
 
 
 
